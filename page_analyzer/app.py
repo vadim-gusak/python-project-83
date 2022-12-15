@@ -87,7 +87,7 @@ def save_url_and_get_id(url_to_save: str):
 def get_all_urls() -> list:
     connection = psycopg2.connect(DATABASE_URL)
     cursor = connection.cursor()
-    cursor.execute('SELECT * FROM urls')
+    cursor.execute('SELECT * FROM urls ORDER BY id DESC')
     rows = cursor.fetchall()
     connection.commit()
     cursor.close()
