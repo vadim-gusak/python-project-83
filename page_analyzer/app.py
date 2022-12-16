@@ -27,8 +27,11 @@ def root_get():
 
 @app.get('/urls')
 def urls_get():
-    rows = get_all_urls()
-    return render_template('/urls/urls.html', rows=rows)
+    urls = get_all_urls()
+    return render_template(
+        '/urls/urls.html',
+        urls=urls
+    )
 
 
 @app.get('/urls/<url_id>')
@@ -38,9 +41,15 @@ def url_id_get(url_id):
         return 'Page not found!', 404
     name, created_at = data
     messages = get_flashed_messages(with_categories=True)
-    return render_template('/urls/show.html', url_id=url_id,
-                           name=name, created_at=created_at,
-                           messages=messages)
+    checks = get_all_checks(url_id)
+    return render_template(
+        '/urls/show.html',
+        url_id=url_id,
+        name=name,
+        created_at=created_at,
+        messages=messages,
+        checks=checks
+    )
 
 
 @app.post('/')
@@ -61,9 +70,16 @@ def root_post():
     return redirect(url_for('url_id_get', url_id=url_id))
 
 
+@app.post('/urls/<url_id>/checks')
+def checks_post(url_id):
+    print(f'{url_id=}')
+    insert_new_check(url_id)
+    return redirect(url_for('url_id_get', url_id=url_id))
+
+
 def save_url_and_get_id(url_to_save: str):
     created_at = datetime.now().date()
-    parsed_url = urlparse((url_to_save))
+    parsed_url = urlparse(url_to_save)
     name = f'{parsed_url.scheme}://{parsed_url.netloc}'
     connection = psycopg2.connect(DATABASE_URL)
     cursor = connection.cursor()
@@ -85,14 +101,32 @@ def save_url_and_get_id(url_to_save: str):
 
 
 def get_all_urls() -> list:
-    connection = psycopg2.connect(DATABASE_URL)
-    cursor = connection.cursor()
-    cursor.execute('SELECT * FROM urls ORDER BY id DESC')
-    rows = cursor.fetchall()
-    connection.commit()
-    cursor.close()
-    connection.close()
-    return rows
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection .cursor() as cursor:
+            # переписать в один цикл
+            cursor.execute(
+                'SELECT * FROM urls ORDER BY id DESC'
+            )
+            rows = cursor.fetchall()
+            result = list()
+            for row in rows:
+                url_id = row[0]
+                name = row[1]
+                cursor.execute(
+                    'SELECT created_at FROM url_checks '
+                    'WHERE url_id = %s ORDER BY id LIMIT 1',
+                    (url_id,)
+                )
+                date = cursor.fetchone()
+                last_check_date = date[0] if date else ''
+                result.append(
+                    {
+                        'id': url_id,
+                        'name': name,
+                        'last_check_date': last_check_date
+                    }
+                )
+    return result
 
 
 def get_data_by_id(url_id: int) -> tuple | None:
@@ -107,3 +141,49 @@ def get_data_by_id(url_id: int) -> tuple | None:
     cursor.close()
     connection.close()
     return data
+
+
+def get_all_checks(url_id):
+    connection = psycopg2.connect(DATABASE_URL)
+    cursor = connection.cursor()
+    cursor.execute(
+        'SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC',
+        (url_id,)
+    )
+    rows = cursor.fetchall()
+    checks = list()
+    for row in rows:
+        checks.append(
+            {
+                'id': row[0],
+                'status_code': row[2],
+                'h1': row[3],
+                'title': row[4],
+                'description': row[5],
+                'created_at': row[6]
+            }
+        )
+    connection.commit()
+    cursor.close()
+    connection.close()
+    return checks
+
+
+def insert_new_check(url_id):
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
+            created_at = datetime.now().date()
+            cursor.execute(
+                'INSERT INTO url_checks '
+                '(url_id, status_code, h1, title, description, created_at) '
+                'VALUES'
+                '(%s, %s, %s, %s, %s, %s)',
+                (
+                    url_id,
+                    200,
+                    'h1 test',
+                    'title test',
+                    'description test',
+                    created_at
+                    )
+                )
