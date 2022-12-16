@@ -6,6 +6,7 @@ from validators.url import url
 from urllib.parse import urlparse
 import psycopg2
 from datetime import datetime
+import requests
 
 
 load_dotenv(find_dotenv())
@@ -72,7 +73,6 @@ def root_post():
 
 @app.post('/urls/<url_id>/checks')
 def checks_post(url_id):
-    print(f'{url_id=}')
     insert_new_check(url_id)
     return redirect(url_for('url_id_get', url_id=url_id))
 
@@ -130,16 +130,13 @@ def get_all_urls() -> list:
 
 
 def get_data_by_id(url_id: int) -> tuple | None:
-    connection = psycopg2.connect(DATABASE_URL)
-    cursor = connection.cursor()
-    cursor.execute(
-        'SELECT name, created_at FROM urls WHERE id = %s',
-        (url_id,)
-    )
-    data = cursor.fetchone()
-    connection.commit()
-    cursor.close()
-    connection.close()
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT name, created_at FROM urls WHERE id = %s',
+                (url_id,)
+            )
+            data = cursor.fetchone()
     return data
 
 
@@ -172,6 +169,16 @@ def get_all_checks(url_id):
 def insert_new_check(url_id):
     with psycopg2.connect(DATABASE_URL) as connection:
         with connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT name FROM urls WHERE id = %s LIMIT 1',
+                (url_id,)
+            )
+            name = cursor.fetchone()[0]
+            status_code, h1, title, description = \
+                get_status_code_h1_title_description(name)
+            if status_code is None:
+                flash('Произошла ошибка при проверке', 'danger')
+                return
             created_at = datetime.now().date()
             cursor.execute(
                 'INSERT INTO url_checks '
@@ -180,10 +187,20 @@ def insert_new_check(url_id):
                 '(%s, %s, %s, %s, %s, %s)',
                 (
                     url_id,
-                    200,
-                    'h1 test',
-                    'title test',
-                    'description test',
+                    status_code,
+                    h1,
+                    title,
+                    description,
                     created_at
                     )
                 )
+
+
+def get_status_code_h1_title_description(link: str) -> \
+        tuple[None | int, str, str, str]:
+    try:
+        resp = requests.get(link)
+    except requests.exceptions.RequestException:
+        return None, '', '', ''
+    status_code = resp.status_code
+    return status_code, 'test h1', 'test title', 'test description'
