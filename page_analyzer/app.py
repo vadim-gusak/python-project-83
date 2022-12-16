@@ -19,7 +19,7 @@ app.config.update(SECRET_KEY=SECRET_KEY)
 
 @app.get('/')
 def root_get():
-    messages = get_flashed_messages()
+    messages = get_flashed_messages(with_categories=True)
     return render_template(
         'index.html',
         messages=messages,
@@ -56,21 +56,19 @@ def url_id_get(url_id):
 
 @app.post('/')
 def root_post():
-    errors, messages = False, list()
+    errors = list()
     url_from_request = request.form.to_dict().get('url')
 
     if not url_from_request:
-        messages.append('URL обязателен')
-        errors = True
-    elif not url(url_from_request) or len(url_from_request) > 255:
-        messages.append('Некорректный URL')
-        errors = True
+        errors.append('URL обязателен')
+    if not url(url_from_request) or len(url_from_request) > 255:
+        errors.append('Некорректный URL')
 
     if errors:
         return render_template(
             'index.html',
-            messages=messages,
-            url_from_request=url_from_request
+            url_from_request=url_from_request,
+            errors=errors
         ), 422
 
     url_id = save_url_and_get_id(url_from_request)
@@ -205,6 +203,7 @@ def insert_new_check(url_id):
                     created_at
                     )
                 )
+            flash('Страница успешно проверена', 'success')
 
 
 def get_status_code_h1_title_description(link: str) -> \

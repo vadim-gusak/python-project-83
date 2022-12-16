@@ -18,9 +18,9 @@
             </div>
         </nav>
     </header>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-danger" role="alert">{{ message }}</div>
+    {% if errors %}
+        {% for error in errors %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
         {% endfor %}
     {% endif %}
     <main class="flex-grow-1">
