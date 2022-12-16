@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 import psycopg2
 from datetime import datetime
 import requests
+from bs4 import BeautifulSoup
 
 
 load_dotenv(find_dotenv())
@@ -143,28 +144,25 @@ def get_data_by_id(url_id: int) -> tuple | None:
 
 
 def get_all_checks(url_id):
-    connection = psycopg2.connect(DATABASE_URL)
-    cursor = connection.cursor()
-    cursor.execute(
-        'SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC',
-        (url_id,)
-    )
-    rows = cursor.fetchall()
     checks = list()
-    for row in rows:
-        checks.append(
-            {
-                'id': row[0],
-                'status_code': row[2],
-                'h1': row[3],
-                'title': row[4],
-                'description': row[5],
-                'created_at': row[6]
-            }
-        )
-    connection.commit()
-    cursor.close()
-    connection.close()
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC',
+                (url_id,)
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                checks.append(
+                    {
+                        'id': row[0],
+                        'status_code': row[2],
+                        'h1': row[3],
+                        'title': row[4],
+                        'description': row[5],
+                        'created_at': row[6]
+                    }
+                )
     return checks
 
 
@@ -185,8 +183,7 @@ def insert_new_check(url_id):
             cursor.execute(
                 'INSERT INTO url_checks '
                 '(url_id, status_code, h1, title, description, created_at) '
-                'VALUES'
-                '(%s, %s, %s, %s, %s, %s)',
+                'VALUES (%s, %s, %s, %s, %s, %s)',
                 (
                     url_id,
                     status_code,
@@ -205,4 +202,15 @@ def get_status_code_h1_title_description(link: str) -> \
     except requests.exceptions.RequestException:
         return None, '', '', ''
     status_code = resp.status_code
-    return status_code, 'test h1', 'test title', 'test description'
+
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    h1_tag = soup.find('h1')
+    title_tag = soup.find('title')
+    description_tag = soup.find('meta', attrs={'name': 'description'})
+
+    h1 = h1_tag.text.strip() if h1_tag else ''
+    title = title_tag.text.strip() if title_tag else ''
+    description = description_tag['content'].strip() \
+        if description_tag else ''
+
+    return status_code, h1, title, description
