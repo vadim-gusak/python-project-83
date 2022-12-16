@@ -113,16 +113,18 @@ def get_all_urls() -> list:
                 url_id = row[0]
                 name = row[1]
                 cursor.execute(
-                    'SELECT created_at FROM url_checks '
+                    'SELECT status_code, created_at FROM url_checks '
                     'WHERE url_id = %s ORDER BY id LIMIT 1',
                     (url_id,)
                 )
                 date = cursor.fetchone()
-                last_check_date = date[0] if date else ''
+                last_status_code = date[0] if date else ''
+                last_check_date = date[1] if date else ''
                 result.append(
                     {
                         'id': url_id,
                         'name': name,
+                        'last_status_code': last_status_code,
                         'last_check_date': last_check_date
                     }
                 )
