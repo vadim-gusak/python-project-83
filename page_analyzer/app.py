@@ -58,16 +58,21 @@ def url_id_get(url_id):
 def root_post():
     errors, messages = False, list()
     url_from_request = request.form.to_dict().get('url')
+
     if not url_from_request:
         messages.append('URL обязателен')
         errors = True
-    elif not url(url_from_request):
+    elif not url(url_from_request) or len(url_from_request) > 255:
         messages.append('Некорректный URL')
         errors = True
+
     if errors:
-        return render_template('index.html',
-                               messages=messages,
-                               url_from_request=url_from_request), 422
+        return render_template(
+            'index.html',
+            messages=messages,
+            url_from_request=url_from_request
+        ), 422
+
     url_id = save_url_and_get_id(url_from_request)
     return redirect(url_for('url_id_get', url_id=url_id))
 
@@ -82,46 +87,51 @@ def save_url_and_get_id(url_to_save: str):
     created_at = datetime.now().date()
     parsed_url = urlparse(url_to_save)
     name = f'{parsed_url.scheme}://{parsed_url.netloc}'
-    connection = psycopg2.connect(DATABASE_URL)
-    cursor = connection.cursor()
-    cursor.execute('SELECT id FROM urls WHERE name = %s LIMIT 1', (name,))
-    data = cursor.fetchone()
-    if data:
-        url_id = data[0]
-        flash('Страница уже существует', 'info')
-    else:
-        cursor.execute('INSERT INTO urls (name, created_at)'
-                       ' VALUES (%s, %s) RETURNING id',
-                       (name, created_at))
-        url_id = cursor.fetchone()[0]
-        flash('Страница успешно добавлена', 'success')
-    connection.commit()
-    cursor.close()
-    connection.close()
+
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT id FROM urls WHERE name = %s LIMIT 1',
+                (name,)
+            )
+            data = cursor.fetchone()
+            if data:
+                flash('Страница уже существует', 'info')
+                return data[0]
+            cursor.execute(
+                'INSERT INTO urls (name, created_at) '
+                'VALUES (%s, %s) RETURNING id',
+                (name, created_at)
+            )
+            url_id = cursor.fetchone()[0]
+            flash('Страница успешно добавлена', 'success')
+
     return url_id
 
 
 def get_all_urls() -> list:
+    urls = list()
+
     with psycopg2.connect(DATABASE_URL) as connection:
-        with connection .cursor() as cursor:
-            # переписать в один цикл
+        with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM urls ORDER BY id DESC'
             )
-            rows = cursor.fetchall()
-            result = list()
-            for row in rows:
+            for row in cursor:
                 url_id = row[0]
                 name = row[1]
-                cursor.execute(
-                    'SELECT status_code, created_at FROM url_checks '
-                    'WHERE url_id = %s ORDER BY id LIMIT 1',
-                    (url_id,)
-                )
-                date = cursor.fetchone()
-                last_status_code = date[0] if date else ''
-                last_check_date = date[1] if date else ''
-                result.append(
+
+                with connection.cursor() as second_cursor:
+                    second_cursor.execute(
+                        'SELECT status_code, created_at FROM url_checks '
+                        'WHERE url_id = %s ORDER BY id LIMIT 1',
+                        (url_id,)
+                    )
+                    data = second_cursor.fetchone()
+                    last_status_code = data[0] if data else ''
+                    last_check_date = data[1] if data else ''
+
+                urls.append(
                     {
                         'id': url_id,
                         'name': name,
@@ -129,7 +139,8 @@ def get_all_urls() -> list:
                         'last_check_date': last_check_date
                     }
                 )
-    return result
+
+    return urls
 
 
 def get_data_by_id(url_id: int) -> tuple | None:
@@ -145,14 +156,14 @@ def get_data_by_id(url_id: int) -> tuple | None:
 
 def get_all_checks(url_id):
     checks = list()
+
     with psycopg2.connect(DATABASE_URL) as connection:
         with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC',
                 (url_id,)
             )
-            rows = cursor.fetchall()
-            for row in rows:
+            for row in cursor:
                 checks.append(
                     {
                         'id': row[0],
@@ -163,6 +174,7 @@ def get_all_checks(url_id):
                         'created_at': row[6]
                     }
                 )
+
     return checks
 
 
