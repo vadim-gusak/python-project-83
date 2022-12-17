@@ -211,19 +211,18 @@ def insert_new_check(url_id):
 def get_status_code_h1_title_description(link: str) -> \
         tuple[None | int, str, str, str]:
     try:
-        resp = requests.get(link, timeout=TIMEOUT)
-        status_code = resp.status_code
-        if status_code > GOOD_STATUS_CODE_LIMIT:
-            return None, '', '', ''
-    except requests.exceptions.RequestException as error:
-        status_code = error.response.status_code if error.response else None
-        return status_code, '', '', ''
+        resp = requests.get(link, timeout=TIMEOUT, allow_redirects=False)
+        if resp.status_code > GOOD_STATUS_CODE_LIMIT:
+            raise requests.exceptions.RequestException
+    except requests.exceptions.RequestException:
+        return None, '', '', ''
 
     soup = BeautifulSoup(resp.text, 'html.parser')
     h1_tag = soup.find('h1')
     title_tag = soup.find('title')
     description_tag = soup.find('meta', attrs={'name': 'description'})
 
+    status_code = resp.status_code
     h1 = h1_tag.text.strip() if h1_tag else ''
     title = title_tag.text.strip() if title_tag else ''
     description = description_tag['content'].strip() \
