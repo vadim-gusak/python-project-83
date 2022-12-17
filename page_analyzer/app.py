@@ -10,6 +10,10 @@ import requests
 from bs4 import BeautifulSoup
 
 
+TIMEOUT = 15
+GOOD_STATUS_CODE_LIMIT = 299
+
+
 load_dotenv(find_dotenv())
 DATABASE_URL = os.getenv('DATABASE_URL')
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -207,9 +211,9 @@ def insert_new_check(url_id):
 def get_status_code_h1_title_description(link: str) -> \
         tuple[None | int, str, str, str]:
     try:
-        resp = requests.get(link, timeout=2)
+        resp = requests.get(link, timeout=TIMEOUT)
         status_code = resp.status_code
-        if status_code > 299:
+        if status_code > GOOD_STATUS_CODE_LIMIT:
             return None, '', '', ''
     except requests.exceptions.RequestException as error:
         status_code = error.response.status_code if error.response else None
