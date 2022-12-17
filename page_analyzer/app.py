@@ -212,11 +212,10 @@ def get_status_code_h1_title_description(link: str) -> \
         resp = requests.get(link)
         status_code = resp.status_code
         if status_code > 299:
-            raise requests.exceptions.RequestException(status_code)
+            return status_code, '', '', ''
     except requests.exceptions.RequestException as error:
-        status_code = error.args[0] if error.response else None
+        status_code = error.response.status_code if error.response else None
         return status_code, '', '', ''
-    status_code = resp.status_code
 
     soup = BeautifulSoup(resp.text, 'html.parser')
     h1_tag = soup.find('h1')

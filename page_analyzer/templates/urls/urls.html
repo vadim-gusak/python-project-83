@@ -33,10 +33,10 @@
                     {% if urls %}
                         {% for url in urls %}
                         <tr>
-                            <th>{{ url.id }}</th>
-                            <th><a href="{{ url_for('url_id_get', url_id=url.id) }}">{{ url.name }}</a></th>
-                            <th>{{ url.last_check_date }}</th>
-                            <th>{{ url.last_status_code }}</th>
+                            <td>{{ url.id }}</td>
+                            <td><a href="{{ url_for('url_id_get', url_id=url.id) }}">{{ url.name }}</a></td>
+                            <td>{{ url.last_check_date }}</td>
+                            <td>{{ url.last_status_code }}</td>
                         </tr>
                         {% endfor %}
                     {% endif %}
