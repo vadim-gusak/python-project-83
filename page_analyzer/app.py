@@ -19,10 +19,8 @@ app.config.update(SECRET_KEY=SECRET_KEY)
 
 @app.get('/')
 def root_get():
-    messages = get_flashed_messages(with_categories=True)
     return render_template(
         'index.html',
-        messages=messages,
         url_from_request=''
     )
 
@@ -201,8 +199,8 @@ def insert_new_check(url_id):
                     title,
                     description,
                     created_at
-                    )
                 )
+            )
             flash('Страница успешно проверена', 'success')
 
 
