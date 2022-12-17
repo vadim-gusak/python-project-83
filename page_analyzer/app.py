@@ -54,7 +54,7 @@ def url_id_get(url_id):
     )
 
 
-@app.post('/')
+@app.post('/urls')
 def root_post():
     errors = list()
     url_from_request = request.form.to_dict().get('url')
