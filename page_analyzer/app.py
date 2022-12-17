@@ -210,8 +210,9 @@ def get_status_code_h1_title_description(link: str) -> \
         tuple[None | int, str, str, str]:
     try:
         resp = requests.get(link)
-    except requests.exceptions.RequestException:
-        return None, '', '', ''
+    except requests.exceptions.RequestException as error:
+        status_code = error.response.status_code if error.response else None
+        return status_code, '', '', ''
     status_code = resp.status_code
 
     soup = BeautifulSoup(resp.text, 'html.parser')
