@@ -209,7 +209,7 @@ def insert_new_check(url_id):
 def get_status_code_h1_title_description(link: str) -> \
         tuple[None | int, str, str, str]:
     try:
-        resp = requests.get(link)
+        resp = requests.get(link, timeout=2)
         status_code = resp.status_code
         if status_code > 299:
             return status_code, '', '', ''
