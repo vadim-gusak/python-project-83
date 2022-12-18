@@ -10,11 +10,11 @@ packages = [{include = "page_analyzer"}]
 python = "^3.10"
 Flask = "^2.2.2"
 gunicorn = "^20.1.0"
-psycopg2-binary = "^2.9.5"
 python-dotenv = "^0.21.0"
 validators = "^0.20.0"
 requests = "^2.28.1"
 beautifulsoup4 = "^4.11.1"
+psycopg2-binary = "^2.9.5"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -22,6 +22,9 @@ flake8 = "^6.0.0"
 pytest = "^7.2.0"
 pytest-cov = "^4.0.0"
 pook = "^1.0.2"
+pytest-postgresql = "^4.1.1"
+psycopg = "^3.1.6"
+pytest-flask = "^1.2.0"
 
 [build-system]
 requires = ["poetry-core"]

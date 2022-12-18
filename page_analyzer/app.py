@@ -83,12 +83,13 @@ def checks_post(url_id):
     return redirect(url_for('url_id_get', url_id=url_id))
 
 
-def save_url_and_get_id(url_to_save: str):
+def save_url_and_get_id(url_to_save: str,
+                        db_connect=psycopg2.connect(DATABASE_URL)):
     created_at = datetime.now().date()
     parsed_url = urlparse(url_to_save)
     name = f'{parsed_url.scheme}://{parsed_url.netloc}'
 
-    with psycopg2.connect(DATABASE_URL) as connection:
+    with db_connect as connection:
         with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT id FROM urls WHERE name = %s LIMIT 1',
@@ -109,10 +110,10 @@ def save_url_and_get_id(url_to_save: str):
     return url_id
 
 
-def get_all_urls() -> list:
+def get_all_urls(db_connect=psycopg2.connect(DATABASE_URL)) -> list:
     urls = list()
 
-    with psycopg2.connect(DATABASE_URL) as connection:
+    with db_connect as connection:
         with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM urls ORDER BY id DESC'
