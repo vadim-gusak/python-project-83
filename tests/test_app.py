@@ -12,13 +12,14 @@ app.config.update(
         'TESTING': True
     }
 )
-
-db_schema_path = os.path.join(os.path.join(os.getcwd(), 'tests'), 'test_database.sql')
+postgresql_my = factories.postgresql('postgresql_my_proc')
+db_schema_path = os.path.join(
+    os.path.join(os.getcwd(), 'tests'), 'test_database.sql'
+)
 with open(db_schema_path) as file:
     schema = file.read()
 
 date = datetime.now().date()
-print(f'{date=}')
 URL_FOR_SAVE = 'https://test.ru/?test=123'
 EXPECTED_NAME = 'https://test.ru'
 EXPECTED_ID = 1
@@ -76,38 +77,17 @@ def test_get_all_urls(db):
     with db:
         with db.cursor() as cursor:
             cursor.execute(
-                'INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at) '
+                'INSERT INTO url_checks '
+                '(url_id, status_code, h1, title, description, created_at) '
                 'VALUES (%s, %s, %s, %s, %s, %s)',
                 (1, 200, "", "", "", date)
             )
             cursor.execute(
-                'INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at) '
+                'INSERT INTO url_checks '
+                '(url_id, status_code, h1, title, description, created_at) '
                 'VALUES (%s, %s, %s, %s, %s, %s)',
                 (2, 200, "", "", "", date)
             )
 
     test_urls = get_all_urls(db_connect=db)
     assert test_urls == ALL_URLS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
