@@ -21,10 +21,10 @@ psycopg2-binary = "^2.9.5"
 flake8 = "^6.0.0"
 pytest = "^7.2.0"
 pytest-cov = "^4.0.0"
-pook = "^1.0.2"
 pytest-postgresql = "^4.1.1"
 psycopg = "^3.1.6"
 pytest-flask = "^1.2.0"
+pook = "^1.0.2"
 
 [build-system]
 requires = ["poetry-core"]

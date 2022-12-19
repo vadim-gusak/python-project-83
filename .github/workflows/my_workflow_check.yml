@@ -23,7 +23,9 @@ jobs:
         run: sudo apt install postgresql postgresql-contrib
 
       - name: Run PostgresQL
-        run: sudo systemctl start postgresql.service
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres createuser --createdb tirion
 
       - name: Install dependencies
         run: |
