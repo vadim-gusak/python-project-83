@@ -280,11 +280,18 @@ description = "HTTP traffic mocking and expectations made easy"
 category = "dev"
 optional = false
 python-versions = "*"
+develop = false
 
 [package.dependencies]
 furl = ">=0.5.6"
 jsonschema = ">=2.5.1"
 xmltodict = ">=0.11.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/h2non/pook.git"
+reference = "HEAD"
+resolved_reference = "6344c4d53b8059f9d2bfc46877a0beb8d8e85edf"
 
 [[package]]
 name = "port-for"
@@ -559,7 +566,7 @@ python-versions = ">=3.4"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "4612a57727c6f0848a0f7c3d8349c9f682109b69886615d05caffa1104acd1b8"
+content-hash = "55fb421a8f4f9f9d2ae94636df91908eeb2ab8c3ddc26238337e14c1cb88ecf4"
 
 [metadata.files]
 attrs = [
@@ -744,11 +751,7 @@ pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
 ]
-pook = [
-    {file = "pook-1.0.2-py2-none-any.whl", hash = "sha256:cd3cbfe280d544e672f41a5b9482883841ba247f865858b57fd59f729e37616a"},
-    {file = "pook-1.0.2-py3-none-any.whl", hash = "sha256:2e16d231ec9fe071c14cad7fe41261f65b401f6cb30935a169cf6fc229bd0a1d"},
-    {file = "pook-1.0.2.tar.gz", hash = "sha256:f28112db062d17db245b351c80f2bb5bf1e56ebfa93d3d75cc44f500c15c40eb"},
-]
+pook = []
 port-for = [
     {file = "port-for-0.6.3.tar.gz", hash = "sha256:232bd999015b7fbdf19f90f3a9298cc742252d67650108123940bfc75c6f4d4e"},
     {file = "port_for-0.6.3-py3-none-any.whl", hash = "sha256:31860afde6cb552e1830c927def3288350c8fbbe9aea8aed8150ed9d1aa0de81"},

@@ -24,7 +24,7 @@ pytest-cov = "^4.0.0"
 pytest-postgresql = "^4.1.1"
 psycopg = "^3.1.6"
 pytest-flask = "^1.2.0"
-pook = "^1.0.2"
+pook = {git = "https://github.com/h2non/pook.git"}
 
 [build-system]
 requires = ["poetry-core"]

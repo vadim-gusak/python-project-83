@@ -25,7 +25,7 @@ jobs:
       - name: Run PostgresQL
         run: |
           sudo systemctl start postgresql.service
-          sudo -u postgres createuser --createdb tirion
+          sudo -u postgres createuser --createdb runner
 
       - name: Install dependencies
         run: |
