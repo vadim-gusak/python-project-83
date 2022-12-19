@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo systemctl start postgresql.service
           sudo -u postgres createuser --createdb runner
-          sudo -u postgres createdb --owner=runner database
+          sudo -u postgres createdb --owner=runner runner
 
       - name: Install dependencies
         run: |

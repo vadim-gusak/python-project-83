@@ -14,11 +14,11 @@ app.config.update(
     }
 )
 
-db_schema_path = os.path.join(
-    os.path.join(os.getcwd(), 'tests'), 'test_database.sql'
-)
+# db_schema_path = os.path.join(
+#     os.path.join(os.getcwd(), 'tests'), 'test_database.sql'
+# )
 
-with open(db_schema_path) as file:
+with open('./tests/test_database.sql') as file:
     schema = file.read()
 
 date = datetime.now().date()
