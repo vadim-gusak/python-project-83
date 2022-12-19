@@ -91,7 +91,7 @@ python-versions = ">=3.5"
 name = "exceptiongroup"
 version = "1.0.4"
 description = "Backport of PEP 654 (exception groups)"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -170,7 +170,7 @@ python-versions = ">=3.5"
 name = "iniconfig"
 version = "1.1.1"
 description = "iniconfig: brain-dead simple config-ini parsing"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -232,7 +232,7 @@ python-versions = ">=3.6"
 name = "mirakuru"
 version = "2.4.2"
 description = "Process executor (not only) for tests."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -257,7 +257,7 @@ six = ">=1.8.0"
 name = "packaging"
 version = "22.0"
 description = "Core utilities for Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -265,7 +265,7 @@ python-versions = ">=3.7"
 name = "pluggy"
 version = "1.0.0"
 description = "plugin and hook calling mechanisms for python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -297,7 +297,7 @@ resolved_reference = "6344c4d53b8059f9d2bfc46877a0beb8d8e85edf"
 name = "port-for"
 version = "0.6.3"
 description = "Utility that helps with local TCP ports management. It can find an unused TCP localhost port and remember the association."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -305,7 +305,7 @@ python-versions = ">=3.7"
 name = "psutil"
 version = "5.9.4"
 description = "Cross-platform lib for process and system monitoring in Python."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -368,7 +368,7 @@ python-versions = ">=3.7"
 name = "pytest"
 version = "7.2.0"
 description = "pytest: simple powerful testing with Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -419,7 +419,7 @@ docs = ["Sphinx", "sphinx-rtd-theme"]
 name = "pytest-postgresql"
 version = "4.1.1"
 description = "Postgresql fixtures and fixture factories for Pytest."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -494,7 +494,7 @@ python-versions = ">=3.6"
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -566,7 +566,7 @@ python-versions = ">=3.4"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "5cc2c29695648c924b4a65dc2c55b174e457ae02fbc638401fbaa3a4a72bf5df"
+content-hash = "5d6aa40671acb9db41701c266eeda5717ba1d873427ecd6822052b1096243596"
 
 [metadata.files]
 attrs = [
