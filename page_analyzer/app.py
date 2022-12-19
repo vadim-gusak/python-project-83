@@ -113,8 +113,8 @@ def save_url_and_get_id(url_to_save: str,
 def get_all_urls(db_connect=psycopg2.connect(DATABASE_URL)) -> list:
     urls = list()
 
-    with db_connect as connection:
-        with connection.cursor() as cursor:
+    with db_connect:
+        with db_connect.cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM urls ORDER BY id DESC'
             )
@@ -122,7 +122,7 @@ def get_all_urls(db_connect=psycopg2.connect(DATABASE_URL)) -> list:
                 url_id = row[0]
                 name = row[1]
 
-                with connection.cursor() as second_cursor:
+                with db_connect.cursor() as second_cursor:
                     second_cursor.execute(
                         'SELECT status_code, created_at FROM url_checks '
                         'WHERE url_id = %s ORDER BY id LIMIT 1',
@@ -144,9 +144,10 @@ def get_all_urls(db_connect=psycopg2.connect(DATABASE_URL)) -> list:
     return urls
 
 
-def get_data_by_id(url_id: int) -> tuple | None:
-    with psycopg2.connect(DATABASE_URL) as connection:
-        with connection.cursor() as cursor:
+def get_data_by_id(url_id: int, db_connect=psycopg2.connect(DATABASE_URL)) ->\
+        tuple | None:
+    with db_connect:
+        with db_connect.cursor() as cursor:
             cursor.execute(
                 'SELECT name, created_at FROM urls WHERE id = %s',
                 (url_id,)
@@ -155,11 +156,11 @@ def get_data_by_id(url_id: int) -> tuple | None:
     return data
 
 
-def get_all_checks(url_id):
+def get_all_checks(url_id, db_connect=psycopg2.connect(DATABASE_URL)):
     checks = list()
 
-    with psycopg2.connect(DATABASE_URL) as connection:
-        with connection.cursor() as cursor:
+    with db_connect:
+        with db_connect.cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC',
                 (url_id,)
@@ -179,9 +180,9 @@ def get_all_checks(url_id):
     return checks
 
 
-def insert_new_check(url_id):
-    with psycopg2.connect(DATABASE_URL) as connection:
-        with connection.cursor() as cursor:
+def insert_new_check(url_id, db_connect=psycopg2.connect(DATABASE_URL)):
+    with db_connect:
+        with db_connect.cursor() as cursor:
             cursor.execute(
                 'SELECT name FROM urls WHERE id = %s LIMIT 1',
                 (url_id,)
