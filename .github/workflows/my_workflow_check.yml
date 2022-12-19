@@ -20,7 +20,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install PostgreSQL
-        run: sudo apt sudo apt install postgresql
+        run: sudo apt install postgresql
 
       - name: Install dependencies
         run: |
