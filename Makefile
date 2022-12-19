@@ -1,9 +1,6 @@
 dev:
 		poetry run flask --app page_analyzer:app --debug run
 
-test:
-		poetry run pytest
-
 lint:
 		poetry run flake8 page_analyzer
 

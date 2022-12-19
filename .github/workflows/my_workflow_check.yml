@@ -1,4 +1,4 @@
-name: my_check
+name: lint_check
 
 on:
   push:
@@ -19,15 +19,6 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install PostgreSQL
-        run: sudo apt install postgresql postgresql-contrib
-
-      - name: Run PostgresQL
-        run: |
-          sudo systemctl start postgresql.service
-          sudo -u postgres createuser --createdb runner
-          sudo -u postgres createdb --owner=runner runner
-
       - name: Install dependencies
         run: |
           pip install poetry
@@ -35,10 +26,3 @@ jobs:
       - name: Run flake8 linter
         run: |
           make lint
-      - name: Test & publish code coverage
-        uses: paambaati/codeclimate-action@v3.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.MY_SECRET_FOR_HEXLET_PROJECT_83 }}
-        with:
-          coverageCommand: make test-cov
-          debug: true

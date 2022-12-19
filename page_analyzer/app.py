@@ -83,13 +83,12 @@ def checks_post(url_id):
     return redirect(url_for('url_id_get', url_id=url_id))
 
 
-def save_url_and_get_id(url_to_save: str,
-                        db_connect=psycopg2.connect(DATABASE_URL)):
+def save_url_and_get_id(url_to_save: str):
     created_at = datetime.now().date()
     parsed_url = urlparse(url_to_save)
     name = f'{parsed_url.scheme}://{parsed_url.netloc}'
 
-    with db_connect as connection:
+    with psycopg2.connect(DATABASE_URL) as connection:
         with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT id FROM urls WHERE name = %s LIMIT 1',
@@ -110,11 +109,11 @@ def save_url_and_get_id(url_to_save: str,
     return url_id
 
 
-def get_all_urls(db_connect=psycopg2.connect(DATABASE_URL)) -> list:
+def get_all_urls() -> list:
     urls = list()
 
-    with db_connect:
-        with db_connect.cursor() as cursor:
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM urls ORDER BY id DESC'
             )
@@ -122,7 +121,7 @@ def get_all_urls(db_connect=psycopg2.connect(DATABASE_URL)) -> list:
                 url_id = row[0]
                 name = row[1]
 
-                with db_connect.cursor() as second_cursor:
+                with connection.cursor() as second_cursor:
                     second_cursor.execute(
                         'SELECT status_code, created_at FROM url_checks '
                         'WHERE url_id = %s ORDER BY id LIMIT 1',
@@ -144,10 +143,9 @@ def get_all_urls(db_connect=psycopg2.connect(DATABASE_URL)) -> list:
     return urls
 
 
-def get_data_by_id(url_id: int, db_connect=psycopg2.connect(DATABASE_URL)) ->\
-        tuple | None:
-    with db_connect:
-        with db_connect.cursor() as cursor:
+def get_data_by_id(url_id: int) -> tuple | None:
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT name, created_at FROM urls WHERE id = %s',
                 (url_id,)
@@ -156,11 +154,11 @@ def get_data_by_id(url_id: int, db_connect=psycopg2.connect(DATABASE_URL)) ->\
     return data
 
 
-def get_all_checks(url_id, db_connect=psycopg2.connect(DATABASE_URL)):
+def get_all_checks(url_id):
     checks = list()
 
-    with db_connect:
-        with db_connect.cursor() as cursor:
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC',
                 (url_id,)
@@ -180,9 +178,9 @@ def get_all_checks(url_id, db_connect=psycopg2.connect(DATABASE_URL)):
     return checks
 
 
-def insert_new_check(url_id, db_connect=psycopg2.connect(DATABASE_URL)):
-    with db_connect:
-        with db_connect.cursor() as cursor:
+def insert_new_check(url_id):
+    with psycopg2.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT name FROM urls WHERE id = %s LIMIT 1',
                 (url_id,)
@@ -212,6 +210,7 @@ def insert_new_check(url_id, db_connect=psycopg2.connect(DATABASE_URL)):
 
 def get_status_code_h1_title_description(link: str) -> \
         tuple[None | int, str, str, str]:
+
     try:
         resp = requests.get(link, timeout=TIMEOUT, allow_redirects=False)
         if resp.status_code > GOOD_STATUS_CODE_LIMIT:
