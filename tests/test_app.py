@@ -1,7 +1,7 @@
 import pook
 from page_analyzer.app import save_url_and_get_id, get_all_urls
 from page_analyzer.app import insert_new_check
-import os
+# import os
 from datetime import datetime
 from page_analyzer import app
 import psycopg2
@@ -10,15 +10,16 @@ import pytest
 
 app.config.update(
     {
-        'TESTING': True
-    }
+        'TESTING': True,
+    },
+    SECRET_KEY='test_secret'
 )
 
 # db_schema_path = os.path.join(
 #     os.path.join(os.getcwd(), 'tests'), 'test_database.sql'
 # )
 
-with open('./tests/test_database.sql') as file:
+with open('tests/test_database.sql') as file:
     schema = file.read()
 
 date = datetime.now().date()
