@@ -316,7 +316,7 @@ test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 name = "psycopg"
 version = "3.1.6"
 description = "PostgreSQL database adapter for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -502,7 +502,7 @@ python-versions = ">=3.7"
 name = "typing-extensions"
 version = "4.4.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -510,7 +510,7 @@ python-versions = ">=3.7"
 name = "tzdata"
 version = "2022.7"
 description = "Provider of IANA time zone data"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2"
 
@@ -566,7 +566,7 @@ python-versions = ">=3.4"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "9be550c54eede2f152082b180d587dfb2102572bbf61f174d87fb2e5748226c9"
+content-hash = "5d6aa40671acb9db41701c266eeda5717ba1d873427ecd6822052b1096243596"
 
 [metadata.files]
 attrs = [

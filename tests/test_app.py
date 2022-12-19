@@ -5,6 +5,7 @@ from datetime import datetime
 from page_analyzer import app
 import psycopg2
 import pytest
+import psycopg
 
 
 app.config.update(
@@ -15,6 +16,7 @@ app.config.update(
 )
 
 date = datetime.now().date()
+for_flake8 = psycopg.cursor
 
 
 @pytest.fixture
