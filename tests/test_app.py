@@ -1,7 +1,6 @@
 import pook
 from page_analyzer.app import save_url_and_get_id, get_all_urls
 from page_analyzer.app import insert_new_check
-# import os
 from datetime import datetime
 from page_analyzer import app
 import psycopg2
@@ -15,13 +14,6 @@ app.config.update(
     SECRET_KEY='test_secret'
 )
 
-# db_schema_path = os.path.join(
-#     os.path.join(os.getcwd(), 'tests'), 'test_database.sql'
-# )
-
-with open('tests/test_database.sql') as file:
-    schema = file.read()
-
 date = datetime.now().date()
 
 
@@ -33,7 +25,24 @@ def db(postgresql):
     db = psycopg2.connect(connection)
     with db:
         with db.cursor() as cursor:
-            cursor.execute(schema)
+            cursor.execute(
+                '''
+                CREATE TABLE urls (
+                    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY, 
+                    name varchar(255), 
+                    created_at date
+                );
+                CREATE TABLE url_checks (
+                    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                    url_id bigint REFERENCES urls (id) NOT NULL,
+                    status_code integer,
+                    h1 varchar(255),
+                    title varchar(255),
+                    description text,
+                    created_at date
+                );
+                '''
+            )
             cursor.execute(
                 'INSERT INTO urls (name, created_at) '
                 'VALUES (%s, %s), (%s, %s)',
