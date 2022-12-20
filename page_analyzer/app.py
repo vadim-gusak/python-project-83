@@ -43,16 +43,10 @@ def url_id_get(url_id):
     data = get_data_by_id(url_id)
     if not data:
         return 'Page not found!', 404
-    name, created_at = data
-    messages = get_flashed_messages(with_categories=True)
-    checks = get_all_checks(url_id)
     return render_template(
         '/urls/show.html',
-        url_id=url_id,
-        name=name,
-        created_at=created_at,
-        messages=messages,
-        checks=checks
+        data=data,
+        url_id=url_id
     )
 
 
@@ -143,28 +137,31 @@ def get_all_urls() -> list:
     return urls
 
 
-def get_data_by_id(url_id: int) -> tuple | None:
+def get_data_by_id(url_id: int) -> dict | None:
+    data = dict()
+
     with psycopg2.connect(DATABASE_URL) as connection:
         with connection.cursor() as cursor:
+
             cursor.execute(
                 'SELECT name, created_at FROM urls WHERE id = %s',
                 (url_id,)
             )
-            data = cursor.fetchone()
-    return data
+            data_from_urls = cursor.fetchone()
+            if not data_from_urls:
+                return
 
+            data['name'] = data_from_urls[0]
+            data['created_at'] = data_from_urls[1]
+            data['checks'] = list()
 
-def get_all_checks(url_id):
-    checks = list()
-
-    with psycopg2.connect(DATABASE_URL) as connection:
-        with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC',
                 (url_id,)
             )
+
             for row in cursor:
-                checks.append(
+                data['checks'].append(
                     {
                         'id': row[0],
                         'status_code': row[2],
@@ -175,7 +172,7 @@ def get_all_checks(url_id):
                     }
                 )
 
-    return checks
+    return data
 
 
 def insert_new_check(url_id):
