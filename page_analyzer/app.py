@@ -43,10 +43,12 @@ def url_id_get(url_id):
     data = get_data_by_id(url_id)
     if not data:
         return 'Page not found!', 404
+    messages = get_flashed_messages(with_categories=True)
     return render_template(
         '/urls/show.html',
         data=data,
-        url_id=url_id
+        url_id=url_id,
+        messages=messages
     )
 
 
