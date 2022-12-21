@@ -111,28 +111,24 @@ def get_all_urls() -> list:
     with psycopg2.connect(DATABASE_URL) as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                'SELECT * FROM urls ORDER BY id DESC'
+                'SELECT DISTINCT ON (urls.id) urls.id, urls.name, '
+                'MAX(url_checks.created_at), url_checks.status_code '
+                '  FROM urls '
+                '  LEFT JOIN url_checks ON urls.id = url_checks.url_id'
+                '  GROUP BY '
+                '  urls.id, url_checks.status_code, url_checks. created_at'
+                '  ORDER BY urls.id DESC, url_checks.created_at DESC;'
             )
+
             for row in cursor:
-                url_id = row[0]
-                name = row[1]
-
-                with connection.cursor() as second_cursor:
-                    second_cursor.execute(
-                        'SELECT status_code, created_at FROM url_checks '
-                        'WHERE url_id = %s ORDER BY id LIMIT 1',
-                        (url_id,)
-                    )
-                    data = second_cursor.fetchone()
-                    last_status_code = data[0] if data else ''
-                    last_check_date = data[1] if data else ''
-
+                last_status_code = row[3] if row[3] else ''
+                last_check_date = row[2] if row[2] else ''
                 urls.append(
                     {
-                        'id': url_id,
-                        'name': name,
-                        'last_status_code': last_status_code,
-                        'last_check_date': last_check_date
+                        'id': row[0],
+                        'name': row[1],
+                        'last_check_date': last_check_date,
+                        'last_status_code': last_status_code
                     }
                 )
 
