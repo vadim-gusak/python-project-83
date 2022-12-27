@@ -24,6 +24,7 @@
         {% endfor %}
     {% endif %}
     <main class="flex-grow-1">
+        {% if data %}
         <div class="container-lg mt-3">
             <h1>Сайт: {{ data.name }}</h1>
             <div class="table-responsive">
@@ -75,6 +76,7 @@
                 </table>
             </div>
         </div>
+        {% endif %}
     </main>
 </body>
 </html>
